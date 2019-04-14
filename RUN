@@ -1,0 +1,17 @@
+#! /bin/bash
+
+rm -f *.huff *.puff
+
+echo rnning compression
+./huff text.txt
+echo compression status $?
+
+ls -1 text.txt text.huff
+
+echo running decompression---------------------
+./puff sampleText.huff
+echo decompression status $?
+
+echo comparing...
+cmp text.txt text.puff
+echo compare status $?

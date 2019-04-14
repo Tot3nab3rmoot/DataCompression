@@ -1,0 +1,200 @@
+#pragma once
+#include <vector>
+#include <iostream>
+
+
+template <class Priority, class Data>
+class Heap {
+
+public:
+	Heap();
+	Heap(Priority proity, Data data);
+
+	void push(Priority priority, Data data);
+
+	Data pop();
+
+	Data peek();
+
+	bool is_empty() { return (heap.size() == 1); }
+	void dump();
+
+	void dumpArr();
+
+	int size() {
+		return (int)heap.size();
+	}
+
+private:
+	struct Node {
+		Priority priority;
+		Data data;
+	};
+	std::vector<Node> heap;
+	int checkForMin(unsigned int index);
+	bool checkParent(int parent, int curr);
+	void bubbleDown(unsigned int index);
+	void bubbleUp(int index);
+	void dumpHelper(int indent, int index);
+
+	void verify(int index=1);
+};
+
+template<class Priority, class Data>
+Heap<Priority, Data>::Heap()
+{
+	Node dummy;
+	heap.push_back(dummy);
+}
+
+template<class Priority, class Data>
+Heap<Priority, Data>::Heap(Priority priority, Data data) {
+	Node dummy;
+	heap.push_back(dummy);
+	Node nodeP;
+	nodeP.priority = priority;
+	nodeP.data = data;
+	heap.push_back(nodeP);
+}
+
+template<class Priority, class Data>
+void Heap<Priority, Data>::push(Priority priority, Data data) {
+	Node nodeP;
+	nodeP.priority = priority;
+	nodeP.data = data;
+	heap.push_back(nodeP);
+	bubbleUp((int)heap.size() - 1);
+}
+
+template<class Priority, class Data>
+inline Data Heap<Priority, Data>::pop()
+{
+	if (heap.size() > 1) {
+		Node min = heap.at(1);
+		heap.at(1) = heap.back();
+		heap.pop_back();
+		bubbleDown(1);
+		return min.data;
+	}
+	return nullptr;
+}
+
+template<class Priority, class Data>
+inline Data Heap<Priority, Data>::peek()
+{
+	if (heap.size() > 1) {
+		return heap.at(1).data;
+	}
+	return NULL;
+}
+
+
+template<class Priority, class Data>
+void Heap<Priority, Data>::bubbleUp(int index) {
+	if (index > 1) {
+		if (checkParent(index / 2, index)) { //return if the parent need to be swaped
+			Node temp = heap.at(index);
+			heap.at(index) = heap.at(index / 2);
+			heap.at(index / 2) = temp;
+			bubbleUp(index / 2);
+		}
+	}
+}
+
+template<class Priority, class Data>
+inline void Heap<Priority, Data>::dump()
+{
+	if (!is_empty()) {
+		int indent = 0;
+		int index = 1;
+		dumpHelper(indent, index);
+	}
+}
+
+template<class Priority, class Data>
+inline void Heap<Priority, Data>::dumpArr()
+{
+        std::cout << "heap dump ========================" << std::endl;
+
+	for (unsigned int i = 1; i < heap.size(); i++) {
+	  std::cout << "\t" << i << "\t" << heap.at(i).priority << std::endl;
+	}
+	verify();
+        std::cout << "==================================" << std::endl;
+}
+
+template<class Priority, class Data>
+int Heap<Priority, Data>::checkForMin(unsigned int index) {
+	int min = index;
+	unsigned int child = index * 2;
+	if (child < heap.size() && heap.at(child).priority < heap.at(index).priority) {
+		min = child;
+	}
+	++child;
+	if (child < heap.size() && heap.at(child).priority < heap.at(min).priority) {
+		min = child;
+	}
+	return min;
+}
+
+template<class Priority, class Data>
+bool Heap<Priority, Data>::checkParent(int parent, int curr) {
+	Priority current = heap.at(curr).priority;
+	Priority pare = heap.at(parent).priority;
+	return (current < pare);
+}
+
+template<class Priority, class Data>
+void Heap<Priority, Data>::bubbleDown(unsigned int index) {
+	if (index >= heap.size()) {
+		return;
+	}
+	unsigned int min = checkForMin(index);
+	if (min != index) {
+		Node temp = heap.at(index);
+		heap.at(index) = heap.at(min);
+		heap.at(min) = temp;
+		bubbleDown(min);
+	}
+}
+
+template<class Priority, class Data>
+void Heap<Priority, Data>::dumpHelper(int indent, int index)
+{
+	for (int i = 0; i < indent; i++) {
+		std::cout << "+----";
+	}
+	std::cout
+		<< "Data(" << heap.at(index).data << "), "
+		<< "Priority(" << heap.at(index).priority << "), "
+		<< std::endl;
+	int size = (int)heap.size();
+	if (index * 2 < size) {
+		dumpHelper(indent + 1, index * 2);
+	}
+	if ((index * 2) + 1 < size) {
+		dumpHelper(indent + 1, (index * 2) + 1);
+	}
+}
+
+
+
+template<class Priority, class Data>
+void Heap<Priority, Data>::verify(int index)
+{
+  unsigned int left = 2 * index;
+  if (left < heap.size()) {
+    verify(left);
+    if (heap.at(left).priority < heap.at(index).priority) {
+      std::cout << "ERROR: inverted priorty at node " << index << " left child " << left << std::endl;
+    }
+  }
+
+  unsigned int right = left + 1;
+  if (right < heap.size()) {
+    verify(right);
+    if (heap.at(right).priority < heap.at(index).priority) {
+      std::cout << "ERROR: inverted priorty at node " << index << " right child " << right << std::endl;
+    }
+  }
+}

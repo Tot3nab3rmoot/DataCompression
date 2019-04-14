@@ -1,0 +1,3 @@
+﻿  HTree.cpp
+c:\users\sura_\source\repos\huffmanalgorithm\huffmanalgorithm\htree.cpp(8): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  HuffmanAlgorithm.vcxproj -> C:\Users\sura_\source\repos\HuffmanAlgorithm\x64\Debug\HuffmanAlgorithm.exe
